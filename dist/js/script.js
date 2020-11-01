@@ -96,4 +96,43 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setClock('.timer', deadline);
 
+    // Modal
+
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
+          modalCloseBtn = document.querySelector('[data-close]'),
+          modal = document.querySelector('.modal');
+
+    modalTrigger.forEach(item => {
+        item.addEventListener('click', () => {
+            // modal.classList.add('show');
+            // modal.classList.remove('hide');
+            modal.classList.toggle('show');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    function closeModal() {
+        // modal.classList.add('hide');
+        // modal.classList.remove('show');
+        modal.classList.toggle('show');
+        document.body.style.overflow = ''; // Убираем прокрутку контента на странице под модальным окном
+    }
+
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target && e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => { // Закрываем модальное окно при нажатии клавиши "Esc"
+    // 'keydown' следит за нажатием клавиш
+        if (e.code === 'Escape' && modal.classList.contains('show')) { // И проверяем что модальное окно открыто, чтобы функция не срабатывала при каждом нажатии клавиши
+            // e.code отслеживает код клавиши (Для "Esc" - "Escape")
+            closeModal();
+        }
+    });
+
+
 });
