@@ -1,6 +1,7 @@
-'use strict';
+//'use strict';
 
 window.addEventListener('DOMContentLoaded', () => {
+    'use strict';
 
     // Tabs
 
@@ -62,9 +63,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function getZero(num) {
-        if (num >= 0 && num < 10) { //Если арг больше или рано 0 И арг меньше 10, то ф-ция возвращает модифицированную строку
+        if (num >= 0 && num < 10) { //Если арг больше или равно 0 И арг меньше 10, то ф-ция возвращает модифицированную строку
             return `0${num}`;
-        } else { //В инном случае возвращаем неименный аргумент
+        } else { //В инном случае возвращаем неизмененный аргумент
             return num;
         }
     }
@@ -143,7 +144,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    //const modalTimerId = setTimeout(openModal, 5000);
+    const modalTimerId = setTimeout(openModal, 5000);
 
     function showModalByScroll() {
         // Если пользователь долистал до конца
@@ -226,5 +227,106 @@ window.addEventListener('DOMContentLoaded', () => {
         '.menu .container',
         'menu__item' //Добавленный аргумент с помощью Rest оператора
     ).render();
+    
+    //Forms FormData
+
+    /* const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Мы скоро с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+
+            //request.setRequestHeader('Content-type', 'multipart/form-data; charset=utf-8');
+            const formData = new FormData(form);
+
+            request.send(formData);
+
+            request.addEventListener('load', () => { //Следим, что запрос прошел
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    } */
+
+    //Forms JSON
+
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Мы скоро с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+
+            request.setRequestHeader('Content-type', 'application/json');
+            const formData = new FormData(form);
+
+            const object = {};
+            formData.forEach((value, key) => { //Перебрали обьект formData и перезаписали его как обычный обьект в переменную object
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object);
+
+            request.send(json);
+
+            request.addEventListener('load', () => { //Следим, что запрос прошел
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
+
+
 
 });
