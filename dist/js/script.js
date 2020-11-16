@@ -101,7 +101,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const modalTrigger = document.querySelectorAll('[data-modal]'),
           modal = document.querySelector('.modal');
-          //modalCloseBtn = document.querySelector('[data-close]'); //Удалили, потому-что будем использовать делегирование собития, чтобы закрывался динамически созданное модальгое окно благодарности
+          //modalCloseBtn = document.querySelector('[data-close]'); //Удалили, потому-что будем использовать делегирование собития, чтобы закрывался динамически созданное модальное окно благодарности
 
     function openModal() {
         modal.classList.add('show');
@@ -116,7 +116,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // item.addEventListener('click', () => {
     //     // modal.classList.add('show');
     //     // modal.classList.remove('hide');
-    //     modal.classList.toggle('show');
     //     document.body.style.overflow = 'hidden';
     });
 
@@ -228,6 +227,8 @@ window.addEventListener('DOMContentLoaded', () => {
     
     //Forms FormData
 
+        // Через XMLHttpRequest:
+
     /* const forms = document.querySelectorAll('form');
 
     const message = {
@@ -252,7 +253,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const request = new XMLHttpRequest();
             request.open('POST', 'server.php');
 
-            //request.setRequestHeader('Content-type', 'multipart/form-data; charset=utf-8'); Для FormData заголовок устанавливать не нужно, он будет автоматически установлен
+            //request.setRequestHeader('Content-type', 'multipart/form-data; charset=utf-8'); //Для FormData заголовок устанавливать не нужно, он будет автоматически установлен
             const formData = new FormData(form);
 
             request.send(formData);
@@ -272,7 +273,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     } */
 
-    //Forms JSON
+        //Через Fetch API:
 
     const forms = document.querySelectorAll('form');
 
@@ -299,10 +300,6 @@ window.addEventListener('DOMContentLoaded', () => {
             //form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            request.setRequestHeader('Content-type', 'application/json');
             const formData = new FormData(form);
 
             const object = {};
@@ -310,20 +307,35 @@ window.addEventListener('DOMContentLoaded', () => {
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object);
-
-            request.send(json);
-
-            request.addEventListener('load', () => { //Следим, что запрос прошел - 200 OK
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showThanksModal(message.success);
-                    statusMessage.remove();
-                    form.reset();
-                } else {
-                    showThanksModal(message.failure);
-                }
+            fetch('server.php', {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object)
+            })
+            .then(data => data.text()) //Переформатируем данные в текст, чтобы в консоли понятно отобразилось
+            .then(data => { // В data передается response
+                console.log(data);
+                showThanksModal(message.success);
+                statusMessage.remove(); //Удаляем наш спинер
+            }).catch(() => {
+                showThanksModal(message.failure);
+            }).finally(() => { //Форма очищается в любом случае, поэтому finally
+                form.reset();
             });
+
+                //Этот блок кода нам не нужен, потому что его функции перенесли в Fetch
+            // request.addEventListener('load', () => { //Следим, что запрос прошел - 200 OK
+            //     if (request.status === 200) {
+            //         console.log(request.response);
+            //         showThanksModal(message.success);
+            //         statusMessage.remove(); //Удаляем наш спинер
+            //         form.reset(); //Очищаем форму
+            //     } else {
+            //         showThanksModal(message.failure);
+            //     }
+            // });
         });
     }
 
