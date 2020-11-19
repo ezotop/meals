@@ -206,9 +206,17 @@ window.addEventListener('DOMContentLoaded', () => {
         return await res.json();
     };
 
-    getResource('http://localhost:3000/menu')
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => {
+            // data.forEach(({img, altimg, title, descr, price}) => { //В {} скобках это деструктуризация обьекта из БД.json
+            //     new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            // });
+    //     });
+
+    axios.get('http://localhost:3000/menu')
         .then(data => {
-            data.forEach(({img, altimg, title, descr, price}) => { //В {} скобках это деструктуризация обьекта из БД.json
+            console.log(data);
+            data.data.forEach(({img, altimg, title, descr, price}) => { //В {} скобках это деструктуризация обьекта из БД.json
                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
             });
         });
@@ -376,48 +384,9 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // Slider
-
-    const slides = document.querySelectorAll('.offer__slide'),
-          prev = document.querySelector('.offer__slider-prev'),
-          next = document.querySelector('.offer__slider-next'),
-          total = document.querySelector('#total'),
-          current = document.querySelector('#current');
-    let slideIndex = 1;
-
-    showSlides(slideIndex);
-
-    total.textContent = getZero(slides.length);
-
-    function showSlides(n) {
-        if (n > slides.length) {
-            slideIndex = 1;
-        }
-
-        if (n < 1) {
-            slideIndex = slides.length;
-        }
-
-        slides.forEach(item => {
-            item.classList.add('hide'); //Скрыли все слайды
-        });
-
-        slides[slideIndex -1].classList.toggle('hide');
-
-        current.textContent = getZero(slideIndex);
-    }
-    
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
-    }
-
-    prev.addEventListener('click', () => {
-        plusSlides(-1);
-    });
-
-    next.addEventListener('click', () => {
-        plusSlides(1);
-    });
+    // fetch('db.json')
+    //     .then(data => data.json())
+    //     .then(res => console.log(res));
 
 
 });
