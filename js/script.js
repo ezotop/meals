@@ -222,54 +222,6 @@ window.addEventListener('DOMContentLoaded', () => {
     //     '.menu .container',
     //     'menu__item' //Добавленный аргумент с помощью Rest оператора
     // ).render();
-    
-    //Forms FormData
-
-        // Через XMLHttpRequest:
-
-    /* const forms = document.querySelectorAll('form');
-
-    const message = {
-        loading: 'Загрузка',
-        success: 'Спасибо! Мы скоро с вами свяжемся',
-        failure: 'Что-то пошло не так...'
-    };
-
-    forms.forEach(item => {
-        postData(item);
-    });
-
-    function postData(form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage);
-
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            //request.setRequestHeader('Content-type', 'multipart/form-data; charset=utf-8'); //Для FormData заголовок устанавливать не нужно, он будет автоматически установлен
-            const formData = new FormData(form);
-
-            request.send(formData);
-
-            request.addEventListener('load', () => { //Следим, что запрос прошел
-                if (request.status === 200) {
-                    console.log(request.response);
-                    statusMessage.textContent = message.success;
-                    form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
-                } else {
-                    statusMessage.textContent = message.failure;
-                }
-            });
-        });
-    } */
 
         //Через Fetch API:
 
@@ -376,48 +328,260 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // Slider
+    // SLIDER
 
     const slides = document.querySelectorAll('.offer__slide'),
+          slider = document.querySelector('.offer__slider'),
           prev = document.querySelector('.offer__slider-prev'),
           next = document.querySelector('.offer__slider-next'),
           total = document.querySelector('#total'),
           current = document.querySelector('#current');
     let slideIndex = 1;
+    const slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+          slidesField = document.querySelector('.offer__slider-inner'), //В вёрстке слайды дополнительно обернули в inner и здесь поместили в переменную для карусели
+          width = window.getComputedStyle(slidesWrapper).width;
+    let offset = 0;
 
-    showSlides(slideIndex);
+        //CAROUSEL SLIDER:
+    slidesField.style.width = 100 * slides.length + '%';
+    slidesField.style.display = 'flex';
+    slidesField.style.transition = '0.5s all';
+
+    slidesWrapper.style.overflow = 'hidden';
 
     total.textContent = getZero(slides.length);
+    current.textContent = getZero(slideIndex);
 
-    function showSlides(n) {
-        if (n > slides.length) {
-            slideIndex = 1;
-        }
-
-        if (n < 1) {
-            slideIndex = slides.length;
-        }
-
-        slides.forEach(item => {
-            item.classList.add('hide'); //Скрыли все слайды
-        });
-
-        slides[slideIndex -1].classList.toggle('hide');
-
-        current.textContent = getZero(slideIndex);
-    }
-    
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
-    }
-
-    prev.addEventListener('click', () => {
-        plusSlides(-1);
+    slides.forEach(item => {
+        item.style.width = width; //Каждому слайду задали фиксированную ширину на случай если картинка будет немного больше или меньше
     });
+
+    slider.style.position = 'relative';
+
+    const indicators = document.createElement('ol'),
+          dots = [];      
+
+    indicators.classList.add('carousel-indicators');
+
+    indicators.style.cssText = `
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        margin-right: 15%;
+        margin-left: 15%;
+        list-style: none;
+    `;
+    slider.append(indicators);
+
+    for (let i = 0; i < slides.length; i++) { //Можно было и forEach
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.style.cssText = `
+            box-sizing: content-box;
+            flex: 0 1 auto;
+            width: 30px;
+            height: 6px;
+            margin-right: 3px;
+            margin-left: 3px;
+            cursor: pointer;
+            background-color: #fff;
+            background-clip: padding-box;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            opacity: .5;
+            transition: opacity .6s ease;
+        `;
+
+        if (i == 0) {
+            dot.style.opacity = 1;
+        }
+
+        indicators.append(dot);
+        dots.push(dot);
+    }
+
+    function opacifyDots(arr) {
+        arr.forEach(dot => dot.style.opacity = '.5');
+        arr[slideIndex - 1].style.opacity = 1;
+    }
+
+    function offsetField(offset) {
+        slidesField.style.transform = `translateX(-${offset}px)`;
+    }
+
+    function deleteNotDigits(str) {
+        return +str.replace(/\D/g, '');
+    }
 
     next.addEventListener('click', () => {
-        plusSlides(1);
+        if (offset == deleteNotDigits(width) * (slides.length - 1)) { //Если отступ будет равен ширине одного слайда умноженного на кол-во слайдов минуc один (если у нас ширина оффсета будет один слайд и 3 за кадром)
+            offset = 0;
+        } else {
+            offset += deleteNotDigits(width); //добавляем к предыдущему отступу еще ширину одного слайда
+        }
+
+        // slidesField.style.transform = `translateX(-${offset}px)`;
+        offsetField(offset);
+
+        if (slideIndex == slides.length) { //Индекс равен количеству слайдов
+            slideIndex = 1;
+        } else {
+            slideIndex++;
+        }
+
+        current.textContent = getZero(slideIndex);
+
+        opacifyDots(dots);
     });
 
+    prev.addEventListener('click', () => {
+        if (offset == 0) {
+            offset = deleteNotDigits(width) * (slides.length - 1);
+        } else {
+            offset -= deleteNotDigits(width); //отнимаем от предыдущего отступа ширину одного слайда
+        }
+
+        // slidesField.style.transform = `translateX(-${offset}px)`;
+        offsetField(offset);
+
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+
+        current.textContent = getZero(slideIndex);
+
+        opacifyDots(dots);
+    });
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to'); //Получили значение дата-атрибута у обьекта события
+            
+            slideIndex = slideTo; //Кликнули на 4 точку, получили значение дата-атрибута "4", в Индекс пойдёт 4
+            offset = deleteNotDigits(width) * (slideTo - 1);
+
+            // slidesField.style.transform = `translateX(-${offset}px)`;
+            offsetField(offset);
+
+            current.textContent = getZero(slideTo);
+
+            opacifyDots(dots);
+
+
+        });
+    });
+
+    //Calculator
+
+    const result = document.querySelector('.calculating__result span');
+    let sex, height, weight, age, ratio;
+
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex');
+    } else {
+        sex = 'female';
+        localStorage.setItem('sex', 'female');
+    }
+
+    if (localStorage.getItem('ratio')) {
+        ratio = localStorage.getItem('ratio');
+    } else {
+        ratio = '1.375';
+        localStorage.setItem('ratio', '1.375');
+    }
+
+    function calcTotal() {
+        if (!sex || !height || !weight || !age || !ratio) { //Если нет хоть одного показателя, то функция не запустится и всплывет какое-то предупреждение
+            result.textContent = '0000';
+            return; //Досрочно прерываем функцию
+        }
+
+        if (sex === 'female') {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        } else {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    }
+
+    function getStaticInformation(parentSelector, activeClass) {
+        const elements = document.querySelectorAll(`${parentSelector} div`); //Получать div внутри parenSelector
+
+        elements.forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target && e.target.getAttribute("data-ratio")) { //Если в обьекта события есть дата-атрибут "data-ratio", то запишем его значение в переменную ratio
+                    ratio = +e.target.getAttribute("data-ratio");
+                    localStorage.setItem('ratio', +e.target.getAttribute("data-ratio"));
+                } else { //Если обьект события не имеет "data-ratio", то в переменную sex запишем значения атрибута id
+                    sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', e.target.getAttribute('id'));
+                }
+    
+                elements.forEach(item => {
+                    item.classList.remove(activeClass);
+                });
+
+                e.target.classList.add(activeClass);
+    
+                calcTotal(); //При каждом клике происходит пересчёт 
+            });
+        });
+
+            //К сожалению, при клике на подложку, ей тоже будет добавляться класс активности и зеленая краска. Поэтому делегирование событий в данном случае не подходит, а подойдет обычный forEach
+        // document.querySelector(parentSelector).addEventListener('click', (e) => {
+        //     if (e.target.getAttribute("data-ratio")) { //Если в обьекта события есть дата-атрибут, то запишем его значение в переменную ratio
+        //         ratio = +e.target.getAttribute("data-ratio");
+        //     } else { //Если обькт события не имеет "data-ratio", то в переменную sex запишем значения атрибута id
+        //         sex = e.target.getAttribute('id');
+        //     }
+
+        //     elements.forEach(item => {
+        //         item.classList.remove(activeClass);
+        //     });
+
+        //     e.target.classList.add(activeClass);
+
+        //     calcTotal(); //При каждом клике происходит пересчёт 
+        // });
+    }
+
+    getStaticInformation('#gender', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+    function getDynamicInformation(selector) {
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+
+            if (input.value.match(/\D+/g)) {
+                input.style.border = '1px solid red';
+            } else {
+                input.style.border = 'none';
+            }
+
+            switch (input.getAttribute('id')) {
+                case 'height':
+                    height = +input.value;
+                    break;
+                case 'weight':
+                    weight = +input.value;
+                    break;
+                case 'age':
+                    age = +input.value;
+                    break;
+            }
+
+            calcTotal(); //При каждом изименении в инпуте происходит пересчёт 
+        });
+    }
+
+    getDynamicInformation('#height');
+    getDynamicInformation('#weight');
+    getDynamicInformation('#age');
 
 });
