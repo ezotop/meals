@@ -496,6 +496,23 @@ window.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('ratio', '1.375');
     }
 
+    function initLocalSettings(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(item => {
+            item.classList.remove(activeClass);
+            if (item.getAttribute('id') === localStorage.getItem('sex')) {
+                item.classList.add(activeClass);
+            }
+            if (item.getAttribute("data-ratio") === localStorage.getItem('ratio')) {
+                item.classList.add(activeClass);
+            }
+        });
+    }
+
+    initLocalSettings('#gender div', 'calculating__choose-item_active');
+    initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active');
+
     function calcTotal() {
         if (!sex || !height || !weight || !age || !ratio) { //Если нет хоть одного показателя, то функция не запустится и всплывет какое-то предупреждение
             result.textContent = '0000';
@@ -509,8 +526,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function getStaticInformation(parentSelector, activeClass) {
-        const elements = document.querySelectorAll(`${parentSelector} div`); //Получать div внутри parenSelector
+    function getStaticInformation(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
 
         elements.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -550,8 +567,8 @@ window.addEventListener('DOMContentLoaded', () => {
         // });
     }
 
-    getStaticInformation('#gender', 'calculating__choose-item_active');
-    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+    getStaticInformation('#gender div', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active');
 
     function getDynamicInformation(selector) {
         const input = document.querySelector(selector);
