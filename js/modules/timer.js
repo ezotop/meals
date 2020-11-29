@@ -1,7 +1,13 @@
-function timer() {
-    // Timer
+function getZero(num) {
+    if (num >= 0 && num < 10) { //Если арг больше или равно 0 И арг меньше 10, то ф-ция возвращает модифицированную строку
+        return `0${num}`;
+    } else { //В инном случае возвращаем неизмененный аргумент
+        return num;
+    }
+}
 
-    const deadline = '2020-10-29'; //отправная точка-конец акции
+function timer(id, deadline) {
+    // Timer
 
     function getTimeRemaining(endtime) { //Разница между дедлайном и текущим временем
         const t = Date.parse(endtime) - Date.parse(new Date()), //превращаем строки в миллисекунды с помощью парса и отнимаем текущее время, чтобы знать сколько осталось до дедлайна
@@ -17,14 +23,6 @@ function timer() {
             'minutes': minutes,
             'seconds': seconds
         };
-    }
-
-    function getZero(num) {
-        if (num >= 0 && num < 10) { //Если арг больше или равно 0 И арг меньше 10, то ф-ция возвращает модифицированную строку
-            return `0${num}`;
-        } else { //В инном случае возвращаем неизмененный аргумент
-            return num;
-        }
     }
 
     function setClock(selector, endtime) {
@@ -52,7 +50,8 @@ function timer() {
 
     }
 
-    setClock('.timer', deadline);
+    setClock(id, deadline);
 }
 
-module.exports = timer;
+export default timer;
+export {getZero};
