@@ -1,15 +1,17 @@
-function slider() {
+import {getZero} from './timer';
+
+function slider({container, slide, nextArrow, prevArrow, totalCounter, currentCounter, wrapper, field}) { //Аргумент деструктуризация обьекта
     // SLIDER
 
-    const slides = document.querySelectorAll('.offer__slide'),
-          slider = document.querySelector('.offer__slider'),
-          prev = document.querySelector('.offer__slider-prev'),
-          next = document.querySelector('.offer__slider-next'),
-          total = document.querySelector('#total'),
-          current = document.querySelector('#current');
+    const slides = document.querySelectorAll(slide), //slide
+          slider = document.querySelector(container), //container
+          prev = document.querySelector(prevArrow),
+          next = document.querySelector(nextArrow),
+          total = document.querySelector(totalCounter),
+          current = document.querySelector(currentCounter);
     let slideIndex = 1;
-    const slidesWrapper = document.querySelector('.offer__slider-wrapper'),
-          slidesField = document.querySelector('.offer__slider-inner'), //В вёрстке слайды дополнительно обернули в inner и здесь поместили в переменную для карусели
+    const slidesWrapper = document.querySelector(wrapper),
+          slidesField = document.querySelector(field), //В вёрстке слайды дополнительно обернули в inner и здесь поместили в переменную для карусели
           width = window.getComputedStyle(slidesWrapper).width;
     let offset = 0;
 
@@ -19,14 +21,6 @@ function slider() {
     slidesField.style.transition = '0.5s all';
 
     slidesWrapper.style.overflow = 'hidden';
-
-    function getZero(num) {
-        if (num >= 0 && num < 10) { //Если арг больше или равно 0 И арг меньше 10, то ф-ция возвращает модифицированную строку
-            return `0${num}`;
-        } else { //В инном случае возвращаем неизмененный аргумент
-            return num;
-        }
-    }
 
     total.textContent = getZero(slides.length);
     current.textContent = getZero(slideIndex);
@@ -157,4 +151,4 @@ function slider() {
     });
 }
 
-module.exports = slider;
+export default slider;
